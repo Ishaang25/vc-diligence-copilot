@@ -1,5 +1,6 @@
 import streamlit as st
-from PyPDF2 import PdfReader
+import fitz  # PyMuPDF
+import base64
 from openai import OpenAI
 
 # -----------------------------
@@ -88,7 +89,7 @@ st.markdown(
 )
 
 st.markdown(
-    '<div class="subtitle">Upload a startup pitch deck or investment memo and receive an AI-powered VC diligence report.</div>',
+    '<div class="subtitle">Upload a startup pitch deck (PDF) and receive an AI-powered VC diligence report.</div>',
     unsafe_allow_html=True
 )
 
@@ -109,23 +110,24 @@ if not api_key:
 # File Upload
 # -----------------------------
 uploaded_file = st.file_uploader(
-    "Upload a PDF",
+    "Upload a PDF Pitch Deck",
     type=["pdf"]
 )
 
 # -----------------------------
-# PDF Extraction Function
+# PDF to Image Conversion Function
 # -----------------------------
-def extract_text(pdf_file):
-    reader = PdfReader(pdf_file)
-    text = ""
-
-    for page in reader.pages:
-        page_text = page.extract_text()
-        if page_text:
-            text += page_text + "\n"
-
-    return text.strip()
+def pdf_to_base64_images(pdf_file):
+    doc = fitz.open(stream=pdf_file.read(), filetype="pdf")
+    images = []
+    # Process all pages
+    for i in range(len(doc)):
+        page = doc.load_page(i)
+        pix = page.get_pixmap()
+        img_bytes = pix.tobytes("png")
+        img_b64 = base64.b64encode(img_bytes).decode("utf-8")
+        images.append(img_b64)
+    return images
 
 # -----------------------------
 # Analyze Button
@@ -134,15 +136,15 @@ if uploaded_file is not None:
 
     if st.button("Run Due Diligence Analysis"):
 
-        with st.spinner("Extracting PDF text..."):
+        with st.spinner("Converting PDF slides to images..."):
             try:
-                extracted_text = extract_text(uploaded_file)
+                images = pdf_to_base64_images(uploaded_file)
             except Exception as e:
                 st.error(f"Error reading PDF: {e}")
                 st.stop()
 
-        if len(extracted_text) < 100:
-            st.error("Could not extract text (might be image-based PDF)")
+        if len(images) == 0:
+            st.error("Could not extract any pages from this PDF.")
             st.stop()
 
         system_prompt = """
@@ -168,30 +170,25 @@ Identify the three most likely reasons this company will fail. Focus on distribu
 Provide three highly numerical, aggressive questions. Example: "Assuming a $50 CAC and a 2% conversion rate, your payback period is 18 months. How do you survive the cash flow gap until then?"
 """
 
-        user_prompt = f"""
-Analyze the following startup document.
-
-Document:
-
-{extracted_text}
-"""
+        user_prompt = "Analyze the following startup pitch deck slides provided as images."
 
         try:
-            with st.spinner("Running AI Due Diligence..."):
-
+            with st.spinner("Running GPT-4o Vision Analysis on the slides..."):
                 client = OpenAI(api_key=api_key)
+
+                # Construct the message with text + multiple images
+                content = [{"type": "text", "text": user_prompt}]
+                for img_b64 in images:
+                    content.append({
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/png;base64,{img_b64}"}
+                    })
 
                 response = client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
-                        {
-                            "role": "system",
-                            "content": system_prompt
-                        },
-                        {
-                            "role": "user",
-                            "content": user_prompt
-                        }
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": content}
                     ],
                     temperature=0.3,
                 )
