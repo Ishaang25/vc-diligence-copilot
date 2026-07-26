@@ -6,6 +6,7 @@ import asyncio
 import logging
 from openai import AsyncOpenAI
 from PIL import Image
+import json
 
 from cache import cache_key, disk_cache_get, disk_cache_set
 from models import SlideAnalysis, SlideType
@@ -83,6 +84,7 @@ async def analyze_slide(
         )
         data["slide_number"] = slide_number
         data["slide_type"] = await classify_slide_type(client, extracted_text or data.get("summary", ""))
+        logger.warning("RAW SLIDE JSON %d: %s", slide_number, json.dumps(data))
         result = SlideAnalysis.model_validate(data)
         print("\n" + "="*80)
         print(f"SLIDE {slide_number}")
