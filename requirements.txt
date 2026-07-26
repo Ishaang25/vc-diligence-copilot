@@ -1,0 +1,11 @@
+streamlit>=1.39.0
+openai>=1.50.0
+PyMuPDF>=1.24.0
+Pillow>=10.4.0
+pydantic>=2.9.0
+python-dotenv>=1.0.1
+markdown>=3.7
+pytesseract>=0.3.13
+tiktoken>=0.7.0
+pytest>=8.3.3
+numpy>=2.1.0
