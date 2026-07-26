@@ -30,6 +30,9 @@ async def generate_ic_memo(company: Company, agent_results: dict[str, AgentResul
     
     messages = [{"role": "system", "content": IC_MEMO_PROMPT}, {"role": "user", "content": "\n".join(parts)}]
     data = await call_openai_json_async(client, messages, model="gpt-4o", temperature=0.4, max_tokens=4000, agent_name="IC Memo")
+
+    if isinstance(data.get("risks"), list):
+        data["risks"] = "\n".join(f"- {r}" for r in data["risks"])
     
     memo = ICMemo.model_validate(data)
     memo.scores = _merge_scores(memo.scores, agent_results, company)
