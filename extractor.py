@@ -95,16 +95,58 @@ def generate_benchmarks(company: Company) -> list[BenchmarkComparison]:
 def run_sanity_checks(company: Company) -> list[SanityCheck]:
     checks = []
     m = company.metrics
+
     if m.ltv_cac_ratio is not None and m.ltv_cac_ratio < 1.0:
-        checks.append(SanityCheck("CAC exceeds LTV", "critical", f"LTV:CAC ratio is {m.ltv_cac_ratio:.1f}:1.", "Do not invest.", False))
+        checks.append(
+            SanityCheck(
+                name="CAC exceeds LTV",
+                severity="critical",
+                message=f"LTV:CAC ratio is {m.ltv_cac_ratio:.1f}:1.",
+                recommendation="Do not invest.",
+                passed=False,
+            )
+        )
+
     if m.runway_months is not None and m.runway_months < 6:
-        checks.append(SanityCheck("Runway < 6 months", "critical", f"Runway is {m.runway_months:.0f} months.", False))
+        checks.append(
+            SanityCheck(
+                name="Runway < 6 months",
+                severity="critical",
+                message=f"Runway is {m.runway_months:.0f} months.",
+                passed=False,
+            )
+        )
+
     if m.gross_margin is not None and m.gross_margin < 40:
-        checks.append(SanityCheck("Low Gross Margin", "warning", f"Gross margin is {m.gross_margin:.1f}%.", False))
+        checks.append(
+            SanityCheck(
+                name="Low Gross Margin",
+                severity="warning",
+                message=f"Gross margin is {m.gross_margin:.1f}%.",
+                passed=False,
+            )
+        )
+
     if m.churn_rate is not None and m.churn_rate > 5:
-        checks.append(SanityCheck("High Churn", "critical" if m.churn_rate > 10 else "warning", f"Monthly churn is {m.churn_rate:.1f}%.", False))
+        checks.append(
+            SanityCheck(
+                name="High Churn",
+                severity="critical" if m.churn_rate > 10 else "warning",
+                message=f"Monthly churn is {m.churn_rate:.1f}%.",
+                passed=False,
+            )
+        )
+
     if not checks:
-        checks.append(SanityCheck("No red flags", "info", "No deterministic red flags.", True))
+        checks.append(
+            SanityCheck(
+                name="No red flags",
+                severity="info",
+                message="No deterministic red flags.",
+                passed=True,
+            )
+        )
+
     return checks
 
 def calculate_traction_score(metrics: Metrics) -> float:
