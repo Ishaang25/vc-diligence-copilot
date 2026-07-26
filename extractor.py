@@ -79,15 +79,35 @@ async def extract_company(slide_analyses: list[SlideAnalysis], file_hash: str, c
     company.benchmarks = generate_benchmarks(company)
     return company
 
-def _format_slides_for_prompt(slide_analyses: list[SlideAnalysis]) -> str:
+def _format_slides_for_prompt(slide_analyses):
     parts = []
-    for s in slide_analyses:
-        part = f"--- SLIDE {s.slide_number} ({s.slide_type.value.upper()}) ---\n{s.summary}\n"
-        if s.numbers: part += f"Numbers: {json.dumps(s.numbers, default=str)}\n"
-        if s.claims: part += f"Claims: {json.dumps(s.claims)}\n"
-        parts.append(part)
-    return "\n\n".join(parts)
 
+    for s in slide_analyses:
+        part = f"""
+==============================
+SLIDE {s.slide_number}
+TYPE: {s.slide_type.value}
+
+SUMMARY:
+{s.summary}
+
+NUMBERS:
+{json.dumps(s.numbers, indent=2)}
+
+CLAIMS:
+{json.dumps(s.claims, indent=2)}
+
+RISKS:
+{json.dumps(s.risks, indent=2)}
+
+EVIDENCE:
+{json.dumps([e.model_dump() for e in s.evidence], indent=2)}
+==============================
+"""
+        parts.append(part)
+
+    return "\n".join(parts)
+    
 def calculate_derived_metrics(metrics: Metrics) -> Metrics:
     if metrics.ltv and metrics.cac and metrics.cac > 0:
         metrics.ltv_cac_ratio = round(metrics.ltv / metrics.cac, 2)
