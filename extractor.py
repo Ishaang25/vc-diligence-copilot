@@ -76,6 +76,29 @@ async def extract_company(slide_analyses: list[SlideAnalysis], file_hash: str, c
     print(json.dumps(data, indent=2))
     
     print("="*80)
+
+    if isinstance(data.get("competitors"), list):
+        fixed = []
+        for c in data["competitors"]:
+            if isinstance(c, str):
+                fixed.append({"name": c})
+            else:
+                fixed.append(c)
+        data["competitors"] = fixed
+
+    if isinstance(data.get("risks"), list):
+        fixed = []
+        for r in data["risks"]:
+            if isinstance(r, str):
+                fixed.append({"description": r})
+            else:
+                fixed.append(r)
+        data["risks"] = fixed
+
+    tech = data.get("technology")
+
+    if isinstance(tech, dict):
+        data["technology"] = json.dumps(tech, indent=2)
     
     company = Company.model_validate(data)
 
