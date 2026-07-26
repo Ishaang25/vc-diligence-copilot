@@ -49,10 +49,26 @@ init_cache()
 init_observability()
 
 def get_api_key():
-    if st.session_state.api_key: return st.session_state.api_key
+    if st.session_state.api_key:
+        st.write("✅ Using API key from text box")
+        return st.session_state.api_key
+
     try:
-        if "openai" in st.secrets: return st.secrets["openai"]["api_key"]
-    except: pass
+        st.write("Secrets keys:", list(st.secrets.keys()))
+
+        if "openai" in st.secrets:
+            st.write("✅ Found [openai] section")
+
+            if "api_key" in st.secrets["openai"]:
+                st.write("✅ Found api_key")
+                return st.secrets["openai"]["api_key"]
+
+            st.write("❌ api_key missing inside [openai]")
+
+    except Exception as e:
+        st.write("Secrets error:", e)
+
+    st.write("❌ No API key found")
     return ""
 
 def render_sidebar():
