@@ -99,6 +99,9 @@ async def extract_company(slide_analyses: list[SlideAnalysis], file_hash: str, c
 
     if isinstance(tech, dict):
         data["technology"] = json.dumps(tech, indent=2)
+
+    print("\nAFTER SANITIZATION\n")
+    print(json.dumps(data, indent=2))
     
     company = Company.model_validate(data)
 
