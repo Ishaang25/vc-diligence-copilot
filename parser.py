@@ -12,7 +12,6 @@ logger = logging.getLogger("dd_copilot.parser")
 JUNK_KEYWORDS = ["thank you", "appendix", "contact us", "legal disclaimer", "questions?", "the end"]
 
 def is_junk_slide(text: str) -> bool:
-    if len(text.strip()) < 20: return True
     lower_text = text.lower()
     return any(kw in lower_text for kw in JUNK_KEYWORDS)
 
