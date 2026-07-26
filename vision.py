@@ -79,6 +79,22 @@ async def analyze_slide(
         data["slide_number"] = slide_number
         data["slide_type"] = await classify_slide_type(client, extracted_text or data.get("summary", ""))
         result = SlideAnalysis.model_validate(data)
+        print("\n" + "="*80)
+        print(f"SLIDE {slide_number}")
+        print("="*80)
+        print("SUMMARY:")
+        print(result.summary)
+        
+        print("\nNUMBERS:")
+        print(result.numbers)
+        
+        print("\nCLAIMS:")
+        print(result.claims)
+        
+        print("\nRISKS:")
+        print(result.risks)
+        
+        print("="*80)
     except Exception as exc:
         logger.error("Slide %d failed: %s", slide_number, exc)
         result = SlideAnalysis(slide_number=slide_number, summary=f"Failed: {exc}")
