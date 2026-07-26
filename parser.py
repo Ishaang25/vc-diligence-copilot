@@ -15,7 +15,13 @@ logger = logging.getLogger("dd_copilot.parser")
 # one line on slides that are otherwise dense with real content (financial appendix tables,
 # team slides with a contact footer), and matching on them alone caused that content to be
 # silently dropped before analysis ever ran.
-JUNK_KEYWORDS = ["thank you", "questions?", "the end", "we're hiring", "get in touch"]
+# Deliberately narrow to phrases that are almost never anything but a pure closing
+# slide. Even "the end", "we're hiring", and "get in touch" were dropped from an earlier
+# version of this list: all three are common substrings of completely ordinary slide
+# sentences (a roadmap saying "by the end of Q4...", a hiring-plan slide saying "we're
+# hiring across engineering...", a partnerships slide saying "get in touch with our BD
+# team...") and caused real content to be misclassified as junk.
+JUNK_KEYWORDS = ["thank you", "questions?"]
 
 # Boilerplate/closer slides are almost always short. If a slide is long, it has real content
 # even if it happens to contain one of the phrases above (e.g. "Thank you for your business"
@@ -24,12 +30,13 @@ JUNK_MAX_CHARS = 250
 
 def is_junk_slide(text: str) -> bool:
     """A slide is treated as junk (and fully skipped) only when it is both short and
-    matches a closing-boilerplate phrase. Truly blank pages are also skipped. Everything
-    else is kept and sent to vision analysis, erring toward 'let the LLM judge relevance'
-    rather than deleting potentially material content before it's ever seen."""
+    matches a closing-boilerplate phrase. We deliberately do NOT treat blank extracted
+    text as junk: many decks (Keynote/Canva exports, print-to-PDF, flattened designs)
+    have zero embedded text layer on every slide even though the slide is visually full
+    of content — that case means 'this slide needs vision/OCR analysis', not 'skip it'.
+    Everything else is kept and sent to analysis, erring toward 'let the LLM judge
+    relevance' rather than deleting potentially material content before it's ever seen."""
     stripped = text.strip()
-    if not stripped:
-        return True
     if len(stripped) > JUNK_MAX_CHARS:
         return False
     lower_text = stripped.lower()
