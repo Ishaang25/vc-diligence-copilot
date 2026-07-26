@@ -30,14 +30,11 @@ async def extract_company(slide_analyses: list[SlideAnalysis], file_hash: str, c
 
     data = await call_openai_json_async(client, messages, model="gpt-4o-mini", temperature=0.2, max_tokens=4000, agent_name="Company Extractor")
     
-    try:
-        company = Company.model_validate(data)
+    print("\n========== GPT EXTRACTION OUTPUT ==========")
+    print(json.dumps(data, indent=2))
+    print("===========================================")
     
-    except ValidationError as e:
-        print("\n========== GPT EXTRACTION OUTPUT ==========")
-        print(json.dumps(data, indent=2))
-        print("===========================================")
-        raise e
+    company = Company.model_validate(data)
 
     disk_cache_set(cache_k, company.model_dump())
     company.metrics = calculate_derived_metrics(company.metrics)
