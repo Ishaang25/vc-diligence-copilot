@@ -38,7 +38,25 @@ def get_relevant_slides(query: str, slides: list[SlideAnalysis], top_k: int = 15
 
 def _prepare_context(company: Company, slide_analyses: list[SlideAnalysis], agent_query: str) -> str:
     relevant_slides = get_relevant_slides(agent_query, slide_analyses)
-    compact_slides = [{"slide": s.slide_number, "type": s.slide_type.value, "summary": s.summary, "numbers": s.numbers} for s in relevant_slides]
+    compact_slides = [
+        {
+            "slide": s.slide_number,
+            "type": s.slide_type.value,
+            "summary": s.summary,
+            "numbers": s.numbers,
+            "claims": s.claims,
+            "risks": s.risks,
+            "evidence": [
+                {
+                    "claim": e.claim,
+                    "quote": e.quote,
+                    "confidence": e.confidence
+                }
+                for e in s.evidence
+            ]
+        }
+        for s in relevant_slides
+    ]
     return f"COMPANY INFO:\n{company.model_dump_json(exclude_none=True)}\n\nRETRIEVED SLIDES:\n{json.dumps(compact_slides, indent=2)}"
 
 async def run_single_agent(agent_name: str, system_prompt: str, company: Company, slide_analyses: list[SlideAnalysis], file_hash: str, client: AsyncOpenAI, query: str) -> AgentResult:
