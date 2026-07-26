@@ -29,6 +29,44 @@ async def extract_company(slide_analyses: list[SlideAnalysis], file_hash: str, c
     messages = [{"role": "system", "content": EXTRACTION_PROMPT}, {"role": "user", "content": slides_text}]
 
     data = await call_openai_json_async(client, messages, model="gpt-4o-mini", temperature=0.2, max_tokens=4000, agent_name="Company Extractor")
+
+    # Sanitize GPT output before validation
+    if not isinstance(data, dict):
+        data = {}
+    
+    # Required string fields
+    if data.get("name") is None:
+        data["name"] = "Unknown"
+    
+    if data.get("description") is None:
+        data["description"] = ""
+    
+    # Nested objects
+    if data.get("metrics") is None:
+        data["metrics"] = {}
+    
+    if data.get("pricing") is None:
+        data["pricing"] = {}
+    
+    if data.get("fundraising") is None:
+        data["fundraising"] = {}
+    
+    # Lists
+    for field in [
+        "competitors",
+        "risks",
+        "regulatory_risks",
+        "benchmarks",
+    ]:
+        if data.get(field) is None:
+            data[field] = []
+    
+    # Optional complex objects
+    if data.get("moat") is None:
+        data["moat"] = {}
+    
+    if data.get("market") is None:
+        data["market"] = None
     
     print("\n========== GPT EXTRACTION OUTPUT ==========")
     print(json.dumps(data, indent=2))
