@@ -22,6 +22,11 @@ async def extract_company(slide_analyses: list[SlideAnalysis], file_hash: str, c
     
     valid_slides = [s for s in slide_analyses if not s.is_skipped]
     slides_text = _format_slides_for_prompt(valid_slides)
+    logger.warning("=" * 80)
+    logger.warning("SLIDES TEXT SENT TO EXTRACTOR")
+    logger.warning("=" * 80)
+    logger.warning(slides_text[:12000])   # first 12k chars
+    logger.warning("=" * 80)
     messages = [{"role": "system", "content": EXTRACTION_PROMPT}, {"role": "user", "content": slides_text}]
 
     data = await call_openai_json_async(client, messages, model="gpt-4o-mini", temperature=0.2, max_tokens=4000, agent_name="Company Extractor")
