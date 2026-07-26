@@ -70,7 +70,7 @@ Given company info and RAG-retrieved slide excerpts most relevant to market size
 2. RECALCULATE TAM bottom-up. Show calculations.
 3. ESTIMATE realistic SOM.
 Cite specific slide numbers [Slide X].
-Return JSON: { "agent_name": "market", "analysis": "md", "key_findings": [], "recommendations": [], "risks": [], "score": 75.0, "confidence": 0.8, "evidence": [] }"""
+Return JSON: { "agent_name": "market", "analysis": "<Write a detailed markdown analysis>", "key_findings": [], "recommendations": [], "risks": [], "score": 75.0, "confidence": 0.8, "evidence": [] }"""
 
 ECONOMICS_AGENT_PROMPT = """You are a unit economics expert.
 Given company info (with pre-calculated metrics) and RAG-retrieved slides about traction/financials:
@@ -78,7 +78,7 @@ Given company info (with pre-calculated metrics) and RAG-retrieved slides about 
 2. BUILD a hypothetical P&L if missing.
 3. FLAG red flags.
 Cite specific data points. Do not perform basic arithmetic.
-Return JSON: { "agent_name": "economics", "analysis": "md", "key_findings": [], "recommendations": [], "risks": [], "score": 65.0, "confidence": 0.75, "evidence": [] }"""
+Return JSON: { "agent_name": "economics", "analysis": "<Write a detailed markdown analysis>", "key_findings": [], "recommendations": [], "risks": [], "score": 65.0, "confidence": 0.75, "evidence": [] }"""
 
 COMPETITION_AGENT_PROMPT = """You are a competitive analysis expert.
 Given company info and RAG-retrieved slides about competitors and product:
@@ -86,26 +86,26 @@ Given company info and RAG-retrieved slides about competitors and product:
 2. RATE each moat dimension.
 3. ASSESS big tech threat.
 Cite specific slide numbers [Slide X].
-Return JSON: { "agent_name": "competition", "analysis": "md", "key_findings": [], "recommendations": [], "risks": [], "score": 60.0, "confidence": 0.7, "evidence": [] }"""
+Return JSON: { "agent_name": "competition", "analysis": "<Write a detailed markdown analysis>", "key_findings": [], "recommendations": [], "risks": [], "score": 60.0, "confidence": 0.7, "evidence": [] }"""
 
 FOUNDER_AGENT_PROMPT = """You are a founder diligence expert.
 Given company info and RAG-retrieved slides about the team:
 1. ASSESS known founder background.
 2. GENERATE 15 aggressive, specific diligence questions referencing numbers.
 3. PROBE red flags.
-Return JSON: { "agent_name": "founder", "analysis": "md", "key_findings": [], "recommendations": [], "risks": [], "score": 70.0, "confidence": 0.6, "evidence": [] }"""
+Return JSON: { "agent_name": "founder", "analysis": "<Write a detailed markdown analysis>", "key_findings": [], "recommendations": [], "risks": [], "score": 70.0, "confidence": 0.6, "evidence": [] }"""
 
 TECHNOLOGY_AGENT_PROMPT = """You are a technology assessment expert.
 Given company info and RAG-retrieved slides about product/tech:
 1. ASSESS architecture and scalability.
 2. EVALUATE technical moat and "wrapper" risks.
-Return JSON: { "agent_name": "technology", "analysis": "md", "key_findings": [], "recommendations": [], "risks": [], "score": 65.0, "confidence": 0.7, "evidence": [] }"""
+Return JSON: { "agent_name": "technology", "analysis": "<Write a detailed markdown analysis>", "key_findings": [], "recommendations": [], "risks": [], "score": 65.0, "confidence": 0.7, "evidence": [] }"""
 
 REGULATION_AGENT_PROMPT = """You are a regulatory risk expert.
 Given company info and RAG-retrieved slides:
 1. IDENTIFY applicable regulations (GDPR, HIPAA, SEC, etc.).
 2. ASSESS compliance status and regulatory moat.
-Return JSON: { "agent_name": "regulation", "analysis": "md", "key_findings": [], "recommendations": [], "risks": [], "score": 70.0, "confidence": 0.7, "evidence": [] }"""
+Return JSON: { "agent_name": "regulation", "analysis": "<Write a detailed markdown analysis>", "key_findings": [], "recommendations": [], "risks": [], "score": 70.0, "confidence": 0.7, "evidence": [] }"""
 
 DEVILS_ADVOCATE_PROMPT = """You are the most skeptical Partner. KILL this deal.
 Given company info and retrieved slides:
@@ -113,7 +113,7 @@ Given company info and retrieved slides:
 2. IDENTIFY fatal flaws and stress test financials.
 3. Deliver the KILL SHOT.
 If you cannot kill it, score it higher.
-Return JSON: { "agent_name": "devils_advocate", "analysis": "md", "key_findings": [], "recommendations": [], "risks": [], "score": 30.0, "confidence": 0.8, "evidence": [] }"""
+Return JSON: { "agent_name": "devils_advocate", "analysis": "<Write a detailed markdown analysis>", "key_findings": [], "recommendations": [], "risks": [], "score": 30.0, "confidence": 0.8, "evidence": [] }"""
 
 IC_MEMO_PROMPT = """You are a Partner writing the final IC memo.
 You have company info (with pre-calculated metrics & benchmarks), agent analyses, and sanity checks.
