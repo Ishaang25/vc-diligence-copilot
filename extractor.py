@@ -18,12 +18,8 @@ async def extract_company(slide_analyses: list[SlideAnalysis], file_hash: str, c
     slides_hash = json.dumps([s.model_dump() for s in slide_analyses if not s.is_skipped], sort_keys=True)
     cache_k = cache_key(file_hash, "company_v4", slides_hash)
     cached = disk_cache_get(cache_k)
-    if cached is not None:
-        company = Company.model_validate(cached)
-        company.metrics = calculate_derived_metrics(company.metrics)
-        company.benchmarks = generate_benchmarks(company)
-        return company
-
+    cached = None
+    
     valid_slides = [s for s in slide_analyses if not s.is_skipped]
     slides_text = _format_slides_for_prompt(valid_slides)
     messages = [{"role": "system", "content": EXTRACTION_PROMPT}, {"role": "user", "content": slides_text}]
