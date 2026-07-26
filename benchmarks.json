@@ -1,0 +1,30 @@
+{
+  "SaaS": {
+    "median_churn": 2.5,
+    "median_gross_margin": 75.0,
+    "median_ltv_cac": 3.0,
+    "median_rule_of_40": 40.0,
+    "source": "Bessemer Cloud Index / Meritech SaaS Metrics"
+  },
+  "FinTech": {
+    "median_churn": 3.5,
+    "median_gross_margin": 60.0,
+    "median_ltv_cac": 2.5,
+    "median_rule_of_40": 35.0,
+    "source": "FT Partners / CB Insights"
+  },
+  "Healthcare": {
+    "median_churn": 2.9,
+    "median_gross_margin": 70.0,
+    "median_ltv_cac": 3.5,
+    "median_rule_of_40": 30.0,
+    "source": "Rock Health / OpenView Benchmarks"
+  },
+  "Default": {
+    "median_churn": 3.0,
+    "median_gross_margin": 65.0,
+    "median_ltv_cac": 3.0,
+    "median_rule_of_40": 35.0,
+    "source": "Industry Aggregate"
+  }
+}
