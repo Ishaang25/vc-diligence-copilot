@@ -15,7 +15,7 @@ from utils import call_openai_json_async, get_embeddings, image_to_base64, prepa
 
 logger = logging.getLogger("dd_copilot.vision")
 EXTRACTION_MODEL = "gpt-4o-mini"
-TEXT_ONLY_THRESHOLD = 150
+TEXT_ONLY_THRESHOLD = 1000
 
 async def classify_slide_type(client: AsyncOpenAI, text: str) -> SlideType:
     if not text or len(text) < 20:
@@ -59,10 +59,18 @@ async def analyze_slide(
             {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}", "detail": "low"}}
         ]}]
     else:
-        prompt = prompt.replace("You are a senior VC analyst. Analyze this SINGLE slide.", 
-                               f"You are a senior VC analyst. Analyze this SINGLE slide. The extracted text is:\n\n{extracted_text}")
-        messages = [{"role": "user", "content": prompt}]
+        messages = [{
+            "role": "user",
+            "content": f"""{SLIDE_ANALYSIS_PROMPT}
 
+    EXTRACTED TEXT:
+
+    {extracted_text}
+    
+    Analyze this slide using the extracted text above.
+    Do not say that information is unavailable if it is present in the extracted text.
+    """
+        }]
     try:
         data = await call_openai_json_async(
             client, messages, model=EXTRACTION_MODEL, temperature=0.2, 
