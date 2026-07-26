@@ -20,14 +20,14 @@ Return JSON: {"slide_type": "CATEGORY"}"""
 
 SLIDE_ANALYSIS_PROMPT = """You are a senior VC analyst. Analyze this SINGLE slide.
 INSTRUCTIONS:
-1. Extract every number, metric, and financial figure.
+1. Extract every number exactly as written including units and currency, metric, and financial figure.
 2. Identify every factual claim.
 3. Flag risks and unsupported assumptions.
 4. Quote exact text for evidence.
 
 Return JSON:
 {
-  "summary": "Brief description",
+  "summary": "A detailed 200–500 word summary of everything visible on the slide including charts, tables, diagrams, bullets, logos, financial metrics and important context.",
   "numbers": {"metric_name": value},
   "claims": ["Claim"],
   "risks": ["Risk"],
@@ -35,7 +35,30 @@ Return JSON:
 }
 """
 
-EXTRACTION_PROMPT = """You are a data extraction specialist. Extract ALL structured information into a company profile.
+EXTRACTION_PROMPT = """You are a data extraction specialist. Extract every piece of information from every slide.
+
+Never invent facts.
+
+If a value is present anywhere in the deck, extract it.
+
+For every metric, preserve units.
+
+Populate every possible field.
+
+If a field truly does not exist, return null.
+
+The company name is mandatory.
+If it appears anywhere in the deck, extract it exactly.
+
+The description should be a detailed 3–6 sentence summary of the business.
+
+The competitors list should include every competitor explicitly mentioned.
+
+The technology section should summarize the architecture, AI usage, integrations and product stack.
+
+The market section should summarize TAM, SAM, SOM, customer segments and GTM.
+
+The metrics object should contain every financial metric found.
 Do NOT calculate ratios (LTV:CAC, Rule of 40); Python will handle math.
 Return JSON with keys: name, tagline, description, stage, sector, headquarters, founded, website, metrics{...}, pricing{...}, competitors[], moat{}, market{}, risks[], technology, regulatory_risks[], fundraising{}.
 Use null for missing data."""
