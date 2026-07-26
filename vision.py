@@ -21,6 +21,11 @@ async def classify_slide_type(client: AsyncOpenAI, text: str) -> SlideType:
     if not text or len(text) < 20:
         return SlideType.OTHER
     try:
+        logger.warning(
+            "Slide %d extracted text:\n%s",
+            slide_number,
+            extracted_text[:3000]
+        )
         data = await call_openai_json_async(
             client, [{"role": "user", "content": SLIDE_CLASSIFIER_PROMPT + f"\n\nTEXT:\n{text}"}],
             model=EXTRACTION_MODEL, temperature=0.0, max_tokens=50, agent_name="Slide Classifier"
@@ -56,7 +61,7 @@ async def analyze_slide(
         image_b64 = image_to_base64(image, fmt="JPEG", quality=75)
         messages = [{"role": "user", "content": [
             {"type": "text", "text": prompt},
-            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}", "detail": "low"}}
+            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}", "detail": "high"}}
         ]}]
     else:
         messages = [{
