@@ -64,9 +64,13 @@ async def extract_company(slide_analyses: list[SlideAnalysis], file_hash: str, c
     if data.get("market") is None:
         data["market"] = None
     
-    print("\n========== GPT EXTRACTION OUTPUT ==========")
+    print("\n" + "="*80)
+    print("RAW COMPANY EXTRACTION")
+    print("="*80)
+    
     print(json.dumps(data, indent=2))
-    print("===========================================")
+    
+    print("="*80)
     
     company = Company.model_validate(data)
 
